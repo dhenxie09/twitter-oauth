@@ -53,14 +53,39 @@ def get_oauth_token(consumer_key, consumer_secret, oauth_verifier, oauth_token, 
     }
 
     try:
-        oauth_token = response.get("oauth_token", "")
-        oauth_token_secret = response.get("oauth_token_secret", "")
-
         result.update({
-            "data": {
-                "oauth_token": oauth_token,
-                "oauth_token_secret": oauth_token_secret
-            }
+            "data": response
+        })
+    except Exception, e:
+        result = {
+            "success": False,
+            "message": "Something went wrong.",
+            "code": 401
+        }
+
+    return result   
+
+
+def logout(consumer_key, consumer_secret, oauth_token, oauth_token_secret):
+    twitter_oauth = TwitterOAuth(
+        consumer_key=consumer_key,
+        consumer_secret=consumer_secret
+    )
+
+    response = twitter_oauth.logout(
+        oauth_token,
+        oauth_token_secret
+    )
+
+    result = {
+        "success": True,
+        "data": {},
+        "code": 200
+    }
+
+    try:
+        result.update({
+            "data": response
         })
     except Exception, e:
         result = {
@@ -86,6 +111,14 @@ def main(
             consumer_key,
             consumer_secret,
             oauth_verifier,
+            oauth_token,
+            oauth_token_secret
+        )
+    
+    if method == "logout":
+        result = logout(
+            consumer_key,
+            consumer_secret,
             oauth_token,
             oauth_token_secret
         )

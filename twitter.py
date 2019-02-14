@@ -5,6 +5,7 @@ class TwitterOAuth(object):
     def __init__(self, consumer_key=None, consumer_secret=None):
         self._request_token_url = "https://api.twitter.com/oauth/request_token"
         self._oauth_token_url = "https://api.twitter.com/oauth/access_token"
+        self._logout_url = 'https://api.twitter.com/1.1/account/logout.json'
         self._consumer_key = consumer_key
         self._consumer_secret = consumer_secret
     
@@ -33,12 +34,24 @@ class TwitterOAuth(object):
                             resource_owner_secret=ro_secret)
         data = {"oauth_verifier": verifier}
         access_token_data = oauth_token.post(self._oauth_token_url, data=data)
-        print(access_token_data.text)
         access_token_list = access_token_data.text.split('&')
         oauth_token = access_token_list[0].split("=")[1]
         oauth_token_secret = access_token_list[1].split("=")[1]
+        user_id = access_token_list[2].split("=")[1]
+        screen_name = access_token_list[3].split("=")[1]
 
         return {
             "oauth_token": oauth_token,
-            "oauth_token_secret": oauth_token_secret
+            "oauth_token_secret": oauth_token_secret,
+            "user_id": user_id,
+            "screen_name": screen_name
         }
+
+    def logout(self, oauth_token, oauth_token_secret):
+        oauth_user = OAuth1Session(client_key=self._consumer_key,
+                                   client_secret=self._consumer_secret,
+                                   resource_owner_key=oauth_token,
+                                   resource_owner_secret=oauth_token_secret)
+        
+        response = oauth_user.post(self._logout_url)
+        return user_data.json()
