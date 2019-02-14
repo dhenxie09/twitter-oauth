@@ -54,4 +54,4 @@ class TwitterOAuth(object):
                                    resource_owner_secret=oauth_token_secret)
         
         response = oauth_user.post(self._logout_url)
-        return user_data.json()
+        return response.json()
